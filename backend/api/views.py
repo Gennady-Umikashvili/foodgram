@@ -1,4 +1,3 @@
-from django.shortcuts import render
 import json
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -34,7 +33,7 @@ from .serializers import (
     FollowSerializer,
     RecipeCreateSerializer,
 )
-from .permissions import OwnerOrRO, AdminOrRO
+from .permissions import OwnerOrRO
 from .filters import AuthorTagFilter, IngredientFilter
 
 
