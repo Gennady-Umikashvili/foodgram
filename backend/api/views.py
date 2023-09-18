@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+from django.shortcuts import render
+>>>>>>> 4d80f233 (fix)
 import json
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -33,7 +37,11 @@ from .serializers import (
     FollowSerializer,
     RecipeCreateSerializer,
 )
+<<<<<<< HEAD
 from .permissions import OwnerOrRO
+=======
+from .permissions import OwnerOrRO, AdminOrRO
+>>>>>>> 4d80f233 (fix)
 from .filters import AuthorTagFilter, IngredientFilter
 
 
