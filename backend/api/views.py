@@ -1,21 +1,18 @@
-from django.shortcuts import render
-import json
 from django.http import HttpResponse
-from django_filters.rest_framework import DjangoFilterBackend
-from django.db.utils import IntegrityError
 from django.shortcuts import get_object_or_404
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework.response import Response
-from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import action
+from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import UserViewSet
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from djoser.views import UserViewSet
-
+from .filters import AuthorTagFilter, IngredientFilter
 from .models import (
     Ingredient,
     Recipe,
@@ -26,6 +23,7 @@ from .models import (
     User,
     Follow,
 )
+from .permissions import RecipeOwner
 from .serializers import (
     RecipeSerializer,
     TagSerializer,
@@ -34,20 +32,18 @@ from .serializers import (
     FollowSerializer,
     RecipeCreateSerializer,
 )
-from .permissions import OwnerOrRO, AdminOrRO
-from .filters import AuthorTagFilter, IngredientFilter
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeCreateSerializer
     pagination_class = PageNumberPagination
-    permission_classes = [OwnerOrRO]
+    permission_classes = (RecipeOwner,)
     filterset_class = AuthorTagFilter
     filter_backends = (DjangoFilterBackend,)
 
     def get_serializer_class(self):
-        if self.action in ["list", "retrieve"]:
+        if self.action in ("list", "retrieve",):
             return RecipeSerializer
         return RecipeCreateSerializer
 
@@ -70,7 +66,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=["post", "delete"],
         permission_classes=[IsAuthenticated],
     )
-    # def favorite(self, request, pk=None):
     def favorite(self, request, **kwargs):
         pk = kwargs.get("pk")
         if request.method == "POST":
@@ -169,28 +164,6 @@ class IngredientsViewSet(ReadOnlyModelViewSet):
     filter_backends = [IngredientFilter]
     search_fields = ["^name"]
     pagination_class = None
-
-
-def import_data(request):
-    with open("api/data/ingredients.json") as f:
-        data = json.loads(f.read())
-    import_count = 0
-    imported = []
-    for ingredient in data:
-        try:
-            Ingredient.objects.create(
-                name=ingredient["name"],
-                measurement_unit=ingredient["measurement_unit"],
-            )
-            import_count += 1
-        except IntegrityError:
-            imported.append(ingredient["name"])
-
-    return HttpResponse(
-        "Данные по ингридиентам импортированы: {} <br> уже в базе: {}".format(
-            import_count, ", ".join(imported)
-        )
-    )
 
 
 class CurrentUserViewSet(UserViewSet):

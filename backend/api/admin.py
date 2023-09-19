@@ -2,7 +2,6 @@ from django.contrib import admin
 
 from .models import Ingredient, Recipe, Amount, Tag, Favorite, UserCart, User
 
-# Register your models here.
 
 admin.site.register(Amount)
 admin.site.register(Tag)
@@ -21,7 +20,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_filter = ("name", "email")
+    list_filter = ("username", "email")
 
 
 @admin.register(Ingredient)

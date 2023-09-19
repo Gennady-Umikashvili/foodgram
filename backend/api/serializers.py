@@ -1,3 +1,4 @@
+from django.db.transaction import atomic
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.db.models import F
@@ -40,9 +41,8 @@ class CurrentUserSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         current_user = self.context.get("request").user
-        if current_user.is_anonymous:
-            return False
-        return Follow.objects.filter(user=current_user, author=obj).exists()
+        return not current_user.is_anonymous and Follow.objects.filter(
+            user=current_user, author=obj).exists()
 
     class Meta:
         model = User
@@ -89,29 +89,36 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         current_user = self.context.get("request").user
-        if current_user.is_anonymous:
-            return False
-        return Favorite.objects.filter(user=current_user, recipe=obj).exists()
+        return not current_user.is_anonymous and Favorite.objects.filter(
+            user=current_user, recipe=obj).exists()
 
     def get_is_in_shopping_cart(self, obj):
         current_user = self.context.get("request").user
-        if current_user.is_anonymous:
-            return False
-        return UserCart.objects.filter(user=current_user, recipe=obj).exists()
+        return not current_user.is_anonymous and UserCart.objects.filter(
+            user=current_user, recipe=obj).exists()
 
     def get_ingredients(self, obj):
         return obj.ingredients.values(
             "id", "name", "measurement_unit", amount=F("ingredients__amount")
         )
 
-    def validate(self, data):
-        print(data)
-
-        ingredients = data.get("recipe_amounts")
+    def validate_ingredients(self, ingredients):
         if len(ingredients) == 0:
             raise serializers.ValidationError(
-                {"ingredients": "не указаны ингредиенты"}
+                "ингредиенты не указаны"
             )
+        return ingredients
+
+    def validate_tags(self, tags):
+        if len(tags) == 0:
+            raise serializers.ValidationError(
+                "теги не указаны"
+            )
+        return tags
+
+    def validate(self, data):
+        ingredients = data.get("recipe_amounts")
+
         ingredients_in_recipe = []
         for ingredient in ingredients:
             if ingredient["ingredient"]["id"] in ingredients_in_recipe:
@@ -119,7 +126,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                     "нужны уникальные ингредиенты"
                 )
             ingredients_in_recipe.append(ingredient["ingredient"]["id"])
-        print(ingredients_in_recipe)
+
         return data
 
     @staticmethod
@@ -131,6 +138,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 amount=ingredient["amount"],
             )
 
+    atomic()
     def create(self, context):
         ingredients = context.pop("recipe_amounts")
         tags = context.pop("tags")
@@ -139,6 +147,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         self.create_ingredients(ingredients, recipe)
         return recipe
 
+    atomic()
     def update(self, recipe, data):
         ingredients = data.pop("recipe_amounts")
         tags = data.pop("tags")
