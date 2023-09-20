@@ -85,7 +85,7 @@ class Recipe(models.Model):
             MinValueValidator(
                 1,
                 message="Минимальное время 1 мин",)
-            )
+            ),
     )
 
     class Meta:
@@ -114,12 +114,12 @@ class Amount(models.Model):
         verbose_name="Количество",
         validators=(
             MaxValueValidator(
-            240,
-            message="Максимальное количество ингредиентов 20"
+                240,
+                message="Максимальное количество ингредиентов 20"
             ),
             MinValueValidator(
-            1,
-            message="Минимальное количество ингредиентов 1"
+                1,
+                message="Минимальное количество ингредиентов 1"
             ),
         )
     )

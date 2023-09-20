@@ -20,7 +20,6 @@ class AuthorTagFilter(FilterSet):
             return queryset.filter(favorite_by_user__user=current_user)
         return queryset
 
-
     def cart_filter(self, queryset, name, value):
         current_user = self.request.user
         if value:
