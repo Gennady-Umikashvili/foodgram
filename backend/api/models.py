@@ -52,6 +52,7 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
+    pub_date = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(
         User,
         verbose_name="Автор",
@@ -93,7 +94,7 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = "Рецепт"
         verbose_name_plural = "Рецепты"
-        ordering = ("name", "cooking_time")
+        ordering = ("-pub_date",)
 
     def __str__(self):
         return self.name[:15]
