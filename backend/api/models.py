@@ -85,7 +85,7 @@ class Recipe(models.Model):
             MinValueValidator(
                 1,
                 message="Минимальное время 1 мин",)
-            ),
+            ),git rebase --autostash [branch to rebase]
     )
 
     class Meta:
