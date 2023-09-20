@@ -1,3 +1,4 @@
+from colorfield.fields import ColorField
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -139,18 +140,14 @@ class Amount(models.Model):
         ordering = ("recipe", "ingredient")
 
     def __str__(self):
-        return f"{1} - {0} {2} ({3})".format(
-            self.ingredient,
-            self.recipe,
-            self.amount,
-            self.ingredient.unit
-        )
+        return (f"{self.recipe} - {self.ingredient} {self.amount} "
+                f"{self.ingredient.unit}")
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=200, unique=True, verbose_name="Тег")
-    color = models.CharField(max_length=200, unique=True, verbose_name="Цвет")
-    slug = models.SlugField(max_length=200, unique=True, verbose_name="slug")
+    name = models.CharField(verbose_name="Тег", max_length=200, unique=True)
+    color = ColorField(verbose_name="Цвет", format="hex", unique=True)
+    slug = models.SlugField(verbose_name="slug", max_length=200, unique=True)
 
     class Meta:
         verbose_name = "Тег"
@@ -216,7 +213,7 @@ class UserCart(models.Model):
         ordering = ("user", "recipe")
 
     def __str__(self):
-        return self.recipe[:15]
+        return self.recipe.name[:15]
 
 
 class Follow(models.Model):
@@ -249,4 +246,4 @@ class Follow(models.Model):
         ordering = ("author", "user")
 
     def __str__(self):
-        return f'self.user + " " + self.author'
+        return f'{self.user} {self.author}'

@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "djoser",
     "django_filters",
     "corsheaders",
+    "colorfield",
 ]
 
 AUTH_USER_MODEL = "api.User"
