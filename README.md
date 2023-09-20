@@ -1,3 +1,7 @@
+http://158.160.30.10/
+
+админка логин и пароль твои 
+
 # FOODGRAM
 
 Foodgram - онлайн сервис для публикации рецептов.
@@ -55,7 +59,6 @@ sudo docker-compose exec backend python manage.py collectstatic --no-input
 sudo docker-compose exec backend python manage.py load_data --path 'recipes/data/tags.json'
 docker-compose exec backend python manage.py load_data --path 'recipes/data/ingredients.json'
 ```
-
 
 ## Автор
 
