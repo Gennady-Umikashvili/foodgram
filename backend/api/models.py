@@ -81,12 +81,15 @@ class Recipe(models.Model):
         validators=(
             MaxValueValidator(
                 240,
-                message="Максимальное время 240 мин"),
+                message="Максимальное время 240 мин"
+            ),
             MinValueValidator(
                 1,
-                message="Минимальное время 1 мин",)
-            ),git rebase --autostash [branch to rebase]
+                message="Минимальное время 1 мин"
+            ),
+        )
     )
+
 
     class Meta:
         verbose_name = "Рецепт"

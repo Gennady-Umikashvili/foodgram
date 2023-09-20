@@ -138,7 +138,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                 amount=ingredient["amount"],
             )
 
-
     atomic()
     def create(self, context):
         ingredients = context.pop("recipe_amounts")
@@ -148,8 +147,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         self.create_ingredients(ingredients, recipe)
         return recipe
 
-
     atomic()
+
     def update(self, recipe, data):
         ingredients = data.pop("recipe_amounts")
         tags = data.pop("tags")
