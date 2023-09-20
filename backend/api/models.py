@@ -47,10 +47,6 @@ class Ingredient(models.Model):
         verbose_name_plural = "Ингредиенты"
         ordering = ("name", "measurement_unit")
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(args, kwargs)
-        self.unit = None
-
     def __str__(self):
         return self.name[:15]
 
@@ -140,8 +136,8 @@ class Amount(models.Model):
         ordering = ("recipe", "ingredient")
 
     def __str__(self):
-        return (f"{self.recipe} - {self.ingredient} {self.amount} "
-                f"{self.ingredient.unit}")
+        return (f"{self.recipe} - {self.ingredient.name} {self.amount} "
+                f"{self.ingredient.name}")
 
 
 class Tag(models.Model):
