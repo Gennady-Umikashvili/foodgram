@@ -20,7 +20,7 @@ services:
     ports:
       - "8080:8000"
     volumes:
-      - ../backend:/api
+
       - static_volume:/api/static/
       - media_volume:/api/media
     depends_on:
@@ -28,7 +28,6 @@ services:
 
   frontend:
     image: gennadyumikashvili/foodgram_frontend
-    command: cp -r /app/build/. /static/
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
@@ -41,10 +40,10 @@ services:
     env_file: .env
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
-        - ../frontend/build:/usr/share/nginx/html/
-        - ../docs/:/usr/share/nginx/html/api/docs/
-        - static_volume:/api/static/
-        - media_volume:/api/media
+      - ../frontend/build:/usr/share/nginx/html/
+      - ../docs/:/usr/share/nginx/html/api/docs/
+      - static_volume:/api/static/
+      - media_volume:/api/media
     depends_on:
       - backend
 
