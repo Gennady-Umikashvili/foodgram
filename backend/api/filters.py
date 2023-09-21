@@ -11,8 +11,8 @@ class AuthorTagFilter(FilterSet):
         to_field_name="slug",
         field_name="tags__slug",
     )
-    favorite = filters.BooleanFilter(method="favorite_filter")
-    cart = filters.BooleanFilter(method="cart_filter")
+    is_favorited = filters.BooleanFilter(method="favorite_filter")
+    is_in_shopping_cart = filters.BooleanFilter(method="cart_filter")
 
     def favorite_filter(self, queryset, name, value):
         current_user = self.request.user

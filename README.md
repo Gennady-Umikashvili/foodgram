@@ -1,6 +1,6 @@
 http://158.160.30.10/
 
-админка логин и пароль твои 
+админка логин и пароль твои
 
 # FOODGRAM
 
@@ -21,7 +21,7 @@ Foodgram - продуктовый помощник с базой кулинар�
 1. Клонируйте проект:
 
 ```
-git clone https://github.com/NikePalk/foodgram-project-react.git
+git clone https://github.com/Gennady-Umikashvili/foodgram-project-react.git
 ```
 
 2. Подготовьте сервер:

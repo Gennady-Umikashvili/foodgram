@@ -41,7 +41,7 @@ class CurrentUserSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         current_user = self.context.get("request").user
-        return not current_user.is_anonymous and Follow.objects.filter(
+        return current_user.is_authenticated and Follow.objects.filter(
             user=current_user, author=obj).exists()
 
     class Meta:
@@ -89,12 +89,12 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         current_user = self.context.get("request").user
-        return not current_user.is_anonymous and Favorite.objects.filter(
+        return current_user.is_authenticated and Favorite.objects.filter(
             user=current_user, recipe=obj).exists()
 
     def get_is_in_shopping_cart(self, obj):
         current_user = self.context.get("request").user
-        return not current_user.is_anonymous and UserCart.objects.filter(
+        return current_user.is_authenticated and UserCart.objects.filter(
             user=current_user, recipe=obj).exists()
 
     def get_ingredients(self, obj):
@@ -107,6 +107,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "ингредиенты не указаны"
             )
+
         return ingredients
 
     def validate_tags(self, tags):
@@ -118,8 +119,9 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         ingredients = data.get("recipe_amounts")
-
+        tags = data.get("tags")
         ingredients_in_recipe = []
+        tags_in_recipe = []
         for ingredient in ingredients:
             if ingredient["ingredient"]["id"] in ingredients_in_recipe:
                 raise serializers.ValidationError(
@@ -127,19 +129,27 @@ class RecipeSerializer(serializers.ModelSerializer):
                 )
             ingredients_in_recipe.append(ingredient["ingredient"]["id"])
 
+        for tag in tags:
+            if tag.id in tags_in_recipe:
+                raise serializers.ValidationError(
+                    "нужны уникальные теги"
+                )
+            tags_in_recipe.append(tag.id)
+
         return data
 
     @staticmethod
     def create_ingredients(ingredients, recipe):
+        new_ingredients = []
         for ingredient in ingredients:
-            Amount.objects.create(
+            new_ingredients.append(Amount(
                 recipe=recipe,
                 ingredient_id=ingredient["ingredient"]["id"],
                 amount=ingredient["amount"],
-            )
+            ))
+        Amount.objects.bulk_create(new_ingredients)
 
     atomic()
-
     def create(self, context):
         ingredients = context.pop("recipe_amounts")
         tags = context.pop("tags")
@@ -149,7 +159,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     atomic()
-
     def update(self, recipe, data):
         ingredients = data.pop("recipe_amounts")
         tags = data.pop("tags")
@@ -222,7 +231,9 @@ class FollowSerializer(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        return Follow.objects.filter(user=obj.user, author=obj.author).exists()
+        current_user = self.context.get("request").user
+        return current_user.is_authenticated and Follow.objects.filter(
+            user=obj.user, author=obj.author).exists()
 
     def get_recipes(self, obj):
         request = self.context.get("request")

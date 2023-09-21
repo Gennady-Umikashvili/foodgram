@@ -4,6 +4,9 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 
+MAX_LENGTH = 15
+
+
 class User(AbstractUser):
     email = models.EmailField(
         "email",
@@ -23,7 +26,7 @@ class User(AbstractUser):
         verbose_name_plural = "Пользователи"
 
     def __str__(self):
-        return self.email[:15]
+        return self.email[:MAX_LENGTH]
 
 
 class Ingredient(models.Model):
@@ -48,7 +51,7 @@ class Ingredient(models.Model):
         ordering = ("name", "measurement_unit")
 
     def __str__(self):
-        return self.name[:15]
+        return self.name[:MAX_LENGTH]
 
 
 class Recipe(models.Model):
@@ -97,7 +100,7 @@ class Recipe(models.Model):
         ordering = ("-pub_date",)
 
     def __str__(self):
-        return self.name[:15]
+        return self.name[:MAX_LENGTH]
 
 
 class Amount(models.Model):
@@ -154,7 +157,7 @@ class Tag(models.Model):
         ordering = ("name",)
 
     def __str__(self):
-        return self.name[:10]
+        return self.name[:MAX_LENGTH]
 
 
 class Favorite(models.Model):
@@ -183,7 +186,7 @@ class Favorite(models.Model):
         ordering = ("user", "recipe")
 
     def __str__(self):
-        return self.recipe[:15]
+        return self.recipe[:MAX_LENGTH]
 
 
 class UserCart(models.Model):
@@ -212,7 +215,7 @@ class UserCart(models.Model):
         ordering = ("user", "recipe")
 
     def __str__(self):
-        return self.recipe.name[:15]
+        return self.recipe.name[:MAX_LENGTH]
 
 
 class Follow(models.Model):

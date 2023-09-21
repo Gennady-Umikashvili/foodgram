@@ -47,17 +47,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeSerializer
         return RecipeCreateSerializer
 
-    def get_queryset(self):
-        if self.request.query_params.get("is_favorited") == "1":
-            self.queryset = self.queryset.filter(
-                favorite_by_user__user=self.request.user
-            )
-        if self.request.query_params.get("is_in_shopping_cart") == "1":
-            self.queryset = self.queryset.filter(
-                in_user_cart__user=self.request.user
-            )
-        return super().get_queryset()
-
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 

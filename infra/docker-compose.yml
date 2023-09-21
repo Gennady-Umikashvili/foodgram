@@ -9,11 +9,11 @@ services:
       - "5432:5432"
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: gennadyumikashvili/foodgram_frontend
     volumes:
       - ../frontend/:/app/result_build/
+    depends_on:
+      - db
 
   nginx:
     image: nginx:1.19.3
