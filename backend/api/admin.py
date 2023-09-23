@@ -32,6 +32,7 @@ class IngredientInline(admin.TabularInline):
     formset = InlineFormset
     extra = 0
 
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ("name", "author", "count_favorites")
