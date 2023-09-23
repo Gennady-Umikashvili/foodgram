@@ -1,7 +1,5 @@
 from django.contrib import admin
 
-
-
 from .models import (
     Ingredient,
     Recipe,
@@ -49,5 +47,3 @@ class IngredientAdmin(admin.ModelAdmin):
 class AmountAdmin(admin.ModelAdmin):
     list_display = ('pk', 'recipe', 'ingredient', 'amount')
     list_editable = ('ingredient', 'amount')
-
-
