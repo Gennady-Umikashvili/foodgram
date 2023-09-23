@@ -106,8 +106,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 70,
                 v_offset,
                 (f"{line_no}. {ingredient['ingredient__name']} - "
-                f"{ingredient['total_amount']}"
-                f"{ingredient['ingredient__measurement_unit']}")
+                 f"{ingredient['total_amount']}"
+                 f"{ingredient['ingredient__measurement_unit']}")
             )
             line_no += 1
             v_offset -= line_size

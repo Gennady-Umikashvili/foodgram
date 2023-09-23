@@ -133,7 +133,6 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         return tags
 
-
     @staticmethod
     def create_ingredients(ingredients, recipe):
         new_ingredients = []
@@ -198,6 +197,7 @@ class RecipeCreateSerializer(RecipeSerializer):
 
     def to_representation(self, instance):
         return RecipeSerializer(instance, context=self.context).data
+
 
 class UserCartSerializer(serializers.ModelSerializer):
     class Meta:
