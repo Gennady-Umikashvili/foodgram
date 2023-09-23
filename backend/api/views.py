@@ -1,3 +1,4 @@
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -80,14 +81,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
         shopping_list = {}
         ingredients = Amount.objects.filter(
             recipe__in_user_cart__user=request.user
-        ).values_list(
-            "ingredient__name", "ingredient__measurement_unit", "amount"
-        )
-        for name, measurement_unit, amount in ingredients:
-            if name not in shopping_list:
-                shopping_list[(name, measurement_unit)] = amount
-            else:
-                shopping_list[(name, measurement_unit)] += amount
+        ).values(
+            "ingredient__name", "ingredient__measurement_unit",
+        ).annotate(
+            total_amount=Sum('amount')
+        ).order_by('ingredient__name')
+
         pdfmetrics.registerFont(TTFont("Cornerita", "Cornerita.ttf", "UTF-8"))
         response = HttpResponse()
         response["Content-Type"] = "application/pdf"
@@ -102,16 +101,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         shopping_list_pdf.drawString(200, v_offset + 50, "список покупок")
         shopping_list_pdf.setFont("Cornerita", size=font_size)
         line_no = 1
-        for name, measurement_unit in sorted(shopping_list.keys()):
+        for ingredient in ingredients:
             shopping_list_pdf.drawString(
                 70,
                 v_offset,
-                "{}. {} - {} {}".format(
-                    line_no,
-                    name,
-                    shopping_list[(name, measurement_unit)],
-                    measurement_unit,
-                ),
+                (f"{line_no}. {ingredient['ingredient__name']} - "
+                f"{ingredient['total_amount']}"
+                f"{ingredient['ingredient__measurement_unit']}")
             )
             line_no += 1
             v_offset -= line_size
@@ -197,8 +193,8 @@ class CurrentUserViewSet(UserViewSet):
     @action(detail=False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
         current_user = request.user
-        following = Follow.objects.filter(user=current_user)
-        pages = self.paginate_queryset(following)
+        authors = User.objects.filter(author__user=current_user)
+        pages = self.paginate_queryset(authors)
         serializer = FollowSerializer(
             pages, context={"request": request}, many=True
         )

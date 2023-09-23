@@ -2,7 +2,7 @@ from colorfield.fields import ColorField
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-
+from django.db.models.functions import Lower
 
 MAX_LENGTH = 15
 
@@ -70,7 +70,7 @@ class Recipe(models.Model):
         verbose_name="Картинка",
         upload_to="recipes/"
     )
-    text = models.TextField("Рецепт")
+    text = models.TextField("Рецепт", unique=True)
     ingredients = models.ManyToManyField(
         Ingredient,
         verbose_name="Ингредиенты",
@@ -147,11 +147,30 @@ class Amount(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField(verbose_name="Тег", max_length=200, unique=True)
-    color = ColorField(verbose_name="Цвет", format="hex", unique=True)
-    slug = models.SlugField(verbose_name="slug", max_length=200, unique=True)
+    name = models.CharField(
+        verbose_name="Тег",
+        max_length=200,
+        unique=True
+    )
+    color = ColorField(
+        verbose_name="Цвет",
+        max_length=7,
+        format="hex",
+        unique=True
+    )
+    slug = models.SlugField(
+        verbose_name="slug",
+        max_length=200,
+        unique=True
+    )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                Lower("color"),
+                name="color_unique",
+            ),
+        ]
         verbose_name = "Тег"
         verbose_name_plural = "Теги"
         ordering = ("name",)
@@ -186,7 +205,7 @@ class Favorite(models.Model):
         ordering = ("user", "recipe")
 
     def __str__(self):
-        return self.recipe[:MAX_LENGTH]
+        return f'{self.recipe} в избранном у {self.user}'
 
 
 class UserCart(models.Model):
