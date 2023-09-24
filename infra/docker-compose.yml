@@ -26,7 +26,6 @@ services:
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static_volume:/api/static/
       - media_volume:/api/media
-
   backend:
     build:
       context: ../backend
