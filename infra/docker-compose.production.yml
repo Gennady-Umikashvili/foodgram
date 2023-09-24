@@ -41,7 +41,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/templates/default.conf.template
       - ../frontend/build:/usr/share/nginx/html/
-      - ../docs/:/usr/share/nginx/html/api/docs/
+      - ./docs/:/usr/share/nginx/html/api/docs/
       - static_volume:/api/static/
       - media_volume:/api/media
     depends_on:
